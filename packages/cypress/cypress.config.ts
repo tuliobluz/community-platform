@@ -2,6 +2,14 @@ import { defineConfig } from 'cypress'
 
 import viteConfig from '../../vite.config'
 import { setupNodeEvents } from './src/plugins'
+import { generateAlphaNumeric } from './src/utils/TestUtils'
+
+const DB_PREFIX:string = generateAlphaNumeric(5)
+
+function withDBPrefix(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) {
+  config.env.DB_PREFIX = DB_PREFIX;
+  return setupNodeEvents(on, config);
+}
 
 export default defineConfig({
   defaultCommandTimeout: 15000,
@@ -23,8 +31,11 @@ export default defineConfig({
     runMode: 2,
     openMode: 0,
   },
+  env: {
+    DB_PREFIX: DB_PREFIX
+  },
   e2e: {
-    setupNodeEvents: setupNodeEvents,
+    setupNodeEvents: withDBPrefix,
     baseUrl: 'http://localhost:3456',
     specPattern: 'src/integration/**/*.{js,jsx,ts,tsx}',
     supportFile: 'src/support/index.ts',

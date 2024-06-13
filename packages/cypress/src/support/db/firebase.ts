@@ -7,7 +7,12 @@ import 'firebase/compat/storage'
 import 'firebase/compat/functions'
 import 'firebase/compat/database'
 
-import { DB_ENDPOINTS } from 'oa-shared/models'
+const WORKSPACE_DIR = resolve(__dirname, '../')
+
+const WORKSPACE_DB_ENDPOINTS = resolve(
+  WORKSPACE_DIR,
+  'src/support/db/endpoints.ts',
+)
 
 import { MOCK_DATA } from '../../data/index'
 
@@ -25,7 +30,7 @@ const db = firebase.firestore()
 
 class FirestoreTestDB {
   seedDB = async () => {
-    const endpoints = ensureDBPrefixes(DB_ENDPOINTS)
+    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, true)
     const dbWrites = Object.keys(MOCK_DATA).map(async (key) => {
       const endpoint = endpoints[key]
       await this.addDocuments(endpoint, Object.values(MOCK_DATA[key]))
@@ -35,7 +40,7 @@ class FirestoreTestDB {
   }
 
   clearDB = async () => {
-    const endpoints = ensureDBPrefixes(DB_ENDPOINTS)
+    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, true)
     const dbDeletes = Object.values(endpoints).map((endpoint) => {
       return this.deleteAll(endpoint)
     })
@@ -48,7 +53,7 @@ class FirestoreTestDB {
     opStr: any,
     value: string,
   ): Cypress.Chainable => {
-    const endpoints = ensureDBPrefixes(DB_ENDPOINTS)
+    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, false)
     const endpoint = endpoints[collectionName]
     return cy
       .wrap(`query: ${endpoint} WHERE ${fieldPath}${opStr}${value}`)
@@ -66,7 +71,6 @@ class FirestoreTestDB {
   }
 
   private addDocuments = async (collectionName: string, docs: any[]) => {
-    cy.log(`DB Seed: ${collectionName}`)
     const batch = db.batch()
     const col = db.collection(collectionName)
     docs.forEach((doc) => {
@@ -76,7 +80,6 @@ class FirestoreTestDB {
     return batch.commit()
   }
   private deleteAll = async (collectionName: string) => {
-    cy.log(`DB Delete: ${collectionName}`)
     const batch = db.batch()
     const col = db.collection(collectionName)
     const docs = (await col.get()) || []
@@ -93,8 +96,8 @@ export const TestDB = new FirestoreTestDB()
  * During initialisation the endpoints imported from endpoints.ts might be populated before the
  * prefix is stored in localstorage. This function ensures they start with the correct prefix
  */
-function ensureDBPrefixes(endpoints: { [key: string]: string }) {
-  const prefix = Cypress.env('DB_PREFIX')
+function ensureDBPrefixes(endpoints: { [key: string]: string }, seed: boolean) {
+  const prefix = seed ? process.env.DB_PREFIX: Cypress.env('DB_PREFIX') 
   Object.entries(endpoints).forEach(([key, value]) => {
     if (!value.startsWith(prefix)) {
       // The regex here is intended to remove collectionPrefix

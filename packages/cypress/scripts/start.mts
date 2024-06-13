@@ -5,6 +5,8 @@ import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import waitOn from 'wait-on'
 
+import { TestDB } from '../src/support/db/firebase'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -78,8 +80,8 @@ main()
 async function main() {
   // copy endpoints for use in testing
   fs.copyFile(PATHS.SRC_DB_ENDPOINTS, PATHS.WORKSPACE_DB_ENDPOINTS)
-  await startAppServer()
-  runTests()
+  await seedDB()
+  //runTests()
 }
 
 /** We need to ensure the platform is up and running before starting tests
@@ -172,4 +174,19 @@ function runTests() {
     console.error('error', spawn.stderr.toString())
   }
   process.exit(spawn.status)
+}
+
+async function seedDB (){
+  try {
+    //await TestDB.seedDB()
+    console.log('Database seeded successfully')
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+
+function handleError(error: any) {
+  console.error(error)
+  process.exit(1)
 }
