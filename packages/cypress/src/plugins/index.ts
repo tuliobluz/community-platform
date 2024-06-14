@@ -1,3 +1,5 @@
+import { TestDB } from "../support/db/firebase"
+
 /* global console */
 export function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) {
   /**

@@ -7,6 +7,8 @@ import waitOn from 'wait-on'
 
 import { TestDB } from '../src/support/db/firebase'
 
+import { generateAlphaNumeric } from '../src/utils/TestUtils'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -33,17 +35,6 @@ export const PATHS = {
   CY_BIN,
   CROSSENV_BIN,
   BUILD_SERVE_JSON,
-}
-
-export const generateAlphaNumeric = (length: number) => {
-  let result = ''
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  const charactersLength = characters.length
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-  }
-  return result
 }
 
 const e2eEnv = config()
@@ -178,7 +169,7 @@ function runTests() {
 
 async function seedDB (){
   try {
-    //await TestDB.seedDB()
+    await TestDB.seedDB()
     console.log('Database seeded successfully')
   } catch (error) {
     handleError(error)

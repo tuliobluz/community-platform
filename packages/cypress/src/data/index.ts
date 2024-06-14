@@ -12,8 +12,26 @@
  *
  **/
 
-import * as allData from 'oa-shared/mocks/data'
 
+import { categories, 
+discussions,
+howtos, 
+mappins,
+questionCategories, 
+questions,
+research,
+tags,
+users,
+messages } from  'oa-shared/mocks/data'
 export const MOCK_DATA = {
-  ...allData,
+  categories, 
+discussions,
+howtos, 
+mappins,
+questionCategories, 
+questions,
+research,
+tags,
+users,
+messages
 }

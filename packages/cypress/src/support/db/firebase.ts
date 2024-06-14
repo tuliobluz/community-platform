@@ -7,13 +7,7 @@ import 'firebase/compat/storage'
 import 'firebase/compat/functions'
 import 'firebase/compat/database'
 
-const WORKSPACE_DIR = resolve(__dirname, '../')
-
-const WORKSPACE_DB_ENDPOINTS = resolve(
-  WORKSPACE_DIR,
-  'src/support/db/endpoints.ts',
-)
-
+import { DB_ENDPOINTS } from 'oa-shared'
 import { MOCK_DATA } from '../../data/index'
 
 const fbConfig = {
@@ -30,7 +24,7 @@ const db = firebase.firestore()
 
 class FirestoreTestDB {
   seedDB = async () => {
-    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, true)
+    const endpoints = ensureDBPrefixes(DB_ENDPOINTS, true)
     const dbWrites = Object.keys(MOCK_DATA).map(async (key) => {
       const endpoint = endpoints[key]
       await this.addDocuments(endpoint, Object.values(MOCK_DATA[key]))
@@ -40,7 +34,7 @@ class FirestoreTestDB {
   }
 
   clearDB = async () => {
-    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, true)
+    const endpoints = ensureDBPrefixes(DB_ENDPOINTS, true)
     const dbDeletes = Object.values(endpoints).map((endpoint) => {
       return this.deleteAll(endpoint)
     })
@@ -53,7 +47,7 @@ class FirestoreTestDB {
     opStr: any,
     value: string,
   ): Cypress.Chainable => {
-    const endpoints = ensureDBPrefixes(WORKSPACE_DB_ENDPOINTS, false)
+    const endpoints = ensureDBPrefixes(DB_ENDPOINTS, false)
     const endpoint = endpoints[collectionName]
     return cy
       .wrap(`query: ${endpoint} WHERE ${fieldPath}${opStr}${value}`)
